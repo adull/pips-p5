@@ -1,4 +1,4 @@
-import { P5Canvas } from "@p5-wrapper/react";
+import { ReactP5Wrapper } from "@p5-wrapper/react";
 import React, { useEffect, useState } from "react";
   
   
@@ -39,7 +39,7 @@ const Pfive = () => {
       };
     }, []);
   
-    return <P5Canvas sketch={sketch} rotation={rotation} />;
+    return <ReactP5Wrapper sketch={sketch} rotation={rotation} />;
     // return <div>haha</div>
   }
 
