@@ -1,46 +1,195 @@
 import { ReactP5Wrapper } from "@p5-wrapper/react";
 import React, { useEffect, useState } from "react";
+import axios from "axios";  
   
-  
-  
+const cell = { w: 40, h: 40 }
+const borderWidth = 6
+
+  /**
+   * @param {import("p5")} p5
+   */
   const sketch = (p5) => {
+    const getPadding = ({ width, height, rows }) => {
+      const tPadding = (height - cell.h * rows.length) / 2
+      const lPadding = (width - cell.w * rows[0].length) / 2
+
+      return { tPadding, lPadding }
+    }
+
+    const drawCell = ({ color, x, y, w, h, neighbors }) => {
+      p5.stroke(color)
+      p5.strokeWeight(borderWidth)
+    
+      if (!neighbors.top)    p5.line(x, y, x + w, y)
+      if (!neighbors.right)  p5.line(x + w, y, x + w, y + h)
+      if (!neighbors.bottom) p5.line(x, y + h, x + w, y + h)
+      if (!neighbors.left)   p5.line(x, y, x, y + h)
+    }
+    
+
+    const getColor = ({ type }) => {
+      const c = type[0]
+    
+      if (c === "<") return [160, 133, 113] // desaturated caramel
+      if (c === ">") return [70, 110, 140]  // softened navy-blue
+      if (c === "=") return [110, 150, 170] // visible blue-teal
+      if (c === "≠") return [120, 170, 140] // gentle emerald green
+      return [200, 120, 90] // low-sat orange-red
+    }
+    
+
+    const createBoard = ({ width, height, rows}) => {
+
+      
+      // console.log({ tPadding, lPadding }) 
+      const { tPadding, lPadding } = getPadding({ width, height, rows })
+      console.log(`board`)
+      console.log({ tPadding, lPadding})
+      for(let i = 0; i < rows.length; i ++) {
+        for(let j = 0; j < rows[i].length; j ++) {
+          if(rows[i][j]) {
+            p5.rect(lPadding + (j * cell.w) , tPadding + (i * cell.h), cell.w, cell.h  )
+          }
+        }
+      }
+      
+      
+    }
+
+    const createRegions = ({width, height, rows, regions}) => {
+      
+      // console.log({ tPadding, lPadding }) 
+      const { tPadding, lPadding } = getPadding({ width, height, rows })
+      // console.log(`createregions`)
+      // console.log({ tPadding, lPadding})
+      regions.forEach(region => {
+        console.log(`region`)
+        const coords = region.coordinates
+
+        console.log(coords)
+        coords.forEach(coord => {
+          // coords.forEach(item => console.log(item))
+          // const topNeighbor   = coords.find(item => item.x === coord.x && item.y === coord.y - 1) ? 1 : 0
+          // const rightNeighbor = coords.find(item => item.x === coord.x + 1 && item.y === coord.y) ? 1 : 0
+          // const botNeighbor   = coords.find(item => item.x === coord.x && item.y === coord.y + 1) ? 1 : 0
+          // const leftNeighbor  = coords.find(item => item.x === coord.x - 1 && item.y === coord.y) ? 1 : 0
+
+          // const neighbors = {top: topNeighbor, right: rightNeighbor, bot: botNeighbor, left: leftNeighbor}
+          const neighbors = {
+            top: coords.some(i => i.x === coord.x && i.y === coord.y - 1),
+            right: coords.some(i => i.x === coord.x + 1 && i.y === coord.y),
+            bottom: coords.some(i => i.x === coord.x && i.y === coord.y + 1),
+            left: coords.some(i => i.x === coord.x - 1 && i.y === coord.y),
+
+          }
+          console.log(`coord`,coord,`neighbors`,neighbors)
+
+          const color = getColor({type: region.computedValue})
+
+          
+          // console.log(cell.w * coord.x, cell.h * coord.y, cell.w, cell.h  )
+          // p5.rectMode(p5.CENTER)
+          // console.log(coord)
+          const x = lPadding + cell.w * coord.x + borderWidth
+          const y = tPadding + (cell.h * coord.y) + borderWidth
+          const w = cell.w - borderWidth * 2
+          const h = cell.h - borderWidth * 2
+          // p5.rect(left, top, w, h)
+          drawCell({color, x, y, w, h, neighbors})
+
+        })
+      })
+      // for(let i = 0; i < rows.length; i ++) {
+      //   for(let j = 0; j < rows[i].length; j ++) {
+      //     if(rows[i][j]) {
+      //       // p5.fill(120, 70, 90);
+      //       p5.stroke(255, 0, 0);
+      //       p5.rect(lPadding + j * cell.w , tPadding + i * cell.h, cell.w, cell.h  )
+            
+      //     }
+      //   }
+      // }
+
+    }
+
+    const createDice = ({ dice }) => {
+      // console.log({ dice })
+      // const cell = Math.min(width / (cols + 2), height / (rows + 2))
+
+      // const squares = dice.length * 2
+
+
+      // p5.line(0, offsetTop, width, offsetTop)
+      // p5.textAlign(p5.CENTER)
+      // p5.text('Dice', width / 2, offsetTop + 30)
+
+      // createGrid({ offsetTop, width, height: 300, rows, cols, isVisible: true })
+      // dice.forEach(die => {
+
+      // })
+    }
+
     let rotation = 0;
   
-    p5.setup = () => p5.createCanvas(600, 400, p5.WEBGL);
+    p5.setup = () => {
+      p5.strokeCap(p5.SQUARE)
+      p5.createCanvas(1000, 1000);
+      p5.background(200);
+      // p5.line(30, 20, 85, 20);
+
+      
+    }
   
     p5.updateWithProps = props => {
-      if (props.rotation) {
-        rotation = (props.rotation * Math.PI) / 180;
+      // console.log(props)
+      const { dice, regions, rows } = props.data
+      const { width, height } = p5
+      console.log(props.data)
+      if(dice && regions && rows ) {
+        createBoard({ width, height: height - 300, rows})
+        createRegions({width, height: height - 300, rows, regions})
+        createDice({ dice })
       }
+      // if (props.rotation) {
+      //   rotation = (props.rotation * Math.PI) / 180;
+      // }
     };
+
   
     p5.draw = () => {
-      p5.background(100);
-      p5.normalMaterial();
-      p5.noStroke();
-      p5.push();
-      p5.rotateY(rotation);
-      p5.box(100);
-      p5.pop();
+      // p5.background(256,256,256);
+      // console.log(p5)
+      
+      // p5.normalMaterial();
+      // p5.noStroke();
+      // p5.push();
+      // p5.rotateY(rotation);
+      // p5.box(100);
+      // p5.pop();
     };
   }
   
 const Pfive = () => {
-    const [rotation, setRotation] = useState(0);
+    const [data, setData] = useState({});
   
     useEffect(() => {
-      const interval = setInterval(
-        () => setRotation(rotation => rotation + 100),
-        100
-      );
-  
-      return () => {
-        clearInterval(interval);
-      };
+      const request = async() => {
+        const res = await axios.get('http://localhost:9001/mothafuckin-api/pips?id=107')
+        const d = res.data
+        if(d) {
+          const gameData = { dice: JSON.parse(d.dice), regions: JSON.parse(d.regions), rows: JSON.parse(d.rows) }
+          console.log({ gameData})
+          setData(gameData)
+        }
+
+        return res
+      }
+
+      const ok = request()
+
     }, []);
   
-    return <ReactP5Wrapper sketch={sketch} rotation={rotation} />;
-    // return <div>haha</div>
+    return <ReactP5Wrapper sketch={sketch} data={data} />;
   }
 
   export default Pfive
