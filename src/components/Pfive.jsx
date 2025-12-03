@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";  
   
 const cell = { w: 100, h: 100 }
+const dicePositions = []
 const borderWidth = 8
 
   /**
@@ -17,9 +18,11 @@ const borderWidth = 8
     }
 
     const drawCell = ({ color, x, y, w, h, neighbors }) => {
+      p5.push()
       p5.stroke(color)
       // p5.strokeCap(p5.SQUARE)
       p5.strokeWeight(borderWidth)
+      
     
       // draw big lines
       if (!neighbors.top)    p5.line(x, y, x + w, y)
@@ -43,6 +46,33 @@ const borderWidth = 8
         p5.line(x, y, x - borderWidth, y)
         p5.line(x, y + h, x - borderWidth, y + h)
       }   
+      p5.pop()
+    }
+
+    const beefedUpDice = (dice) => {
+      console.log(dice)
+      const count = dice.length
+      const rows = [dice.slice(0,Math.ceil(count / 2)), dice.slice(Math.ceil(count / 2),count)]
+      console.log(rows)
+      const paddingX = 100
+      const paddingY = 50
+      const offsetTop = p5.height - 300 
+      const beefy = []
+      rows.forEach((row, rIndex) => {
+        row.forEach((die, dIndex) => {
+          beefy.push({ 
+            id: `${rIndex}-${dIndex}`,
+            val: die, 
+            position: { 
+              x: paddingX + (dIndex / (row.length + 1)) * p5.width, 
+              y: offsetTop + paddingY + (rIndex / (rows.length + 1)) * 300  
+            },
+            // awake is used to ignore dies that are inert - don't animate them in the onframe loop
+            awake: false
+          })
+        })
+      })
+      return beefy
     }
 
     const drawDiamond = ({ coords, left, top, text, color }) => {
@@ -69,11 +99,13 @@ const borderWidth = 8
       p5.strokeWeight(2)
 
       p5.fill(color)
-      p5.rect(-10, -10, 20, 20)    
+      p5.rect(-10, -10, 30, 30)    
       p5.fill(255)
       p5.rotate(p5.radians(-45))   
       p5.textAlign(p5.CENTER, p5.CENTER)
-      p5.text(text, 0, 0)
+      p5.textSize(18)
+      p5.text(text, 0, 9)
+      
       p5.pop()              
     }
     
@@ -90,12 +122,7 @@ const borderWidth = 8
     
 
     const createBoard = ({ width, height, rows}) => {
-
-      
-      // console.log({ tPadding, lPadding }) 
       const { tPadding, lPadding } = getPadding({ width, height, rows })
-      console.log(`board`)
-      console.log({ tPadding, lPadding})
       for(let i = 0; i < rows.length; i ++) {
         for(let j = 0; j < rows[i].length; j ++) {
           if(rows[i][j]) {
@@ -103,15 +130,11 @@ const borderWidth = 8
           }
         }
       }
-      
-      
     }
 
-    const createRegions = ({width, height, rows, regions}) => {
+    const createRegions = ({ width, height, rows, regions }) => {
       const { tPadding, lPadding } = getPadding({ width, height, rows })
       regions.forEach(region => {
-        
-
         const { coordinates: coords = region.coordinates, computedValue: val = region.computedValue } = region
         const color = getColor({ type: val })
 
@@ -121,7 +144,6 @@ const borderWidth = 8
             right: coords.some(i => i.x === coord.x + 1 && i.y === coord.y),
             bottom: coords.some(i => i.x === coord.x && i.y === coord.y + 1),
             left: coords.some(i => i.x === coord.x - 1 && i.y === coord.y),
-
           }
 
           
@@ -129,7 +151,7 @@ const borderWidth = 8
           const y = tPadding + (cell.h * coord.y) + borderWidth
           const w = cell.w - borderWidth * 2
           const h = cell.h - borderWidth * 2
-          drawCell({color, x, y, w, h, neighbors})
+          drawCell({ color, x, y, w, h, neighbors })
 
         })
         drawDiamond({ coords, left: lPadding, top: tPadding, text: val, color })
@@ -137,24 +159,24 @@ const borderWidth = 8
 
     }
 
-    const createDice = ({ dice }) => {
+    const createDice = ({ width, offsetTop, dice }) => {
       // console.log({ dice })
-      // const cell = Math.min(width / (cols + 2), height / (rows + 2))
+      
+      p5.push()
+      p5.line(0, offsetTop, p5.width, offsetTop)
+      
 
-      // const squares = dice.length * 2
-
-
-      // p5.line(0, offsetTop, width, offsetTop)
-      // p5.textAlign(p5.CENTER)
-      // p5.text('Dice', width / 2, offsetTop + 30)
-
-      // createGrid({ offsetTop, width, height: 300, rows, cols, isVisible: true })
-      // dice.forEach(die => {
-
-      // })
+      // call beefedUpDice to make it easier to work with
+      beefedUpDice(dice).forEach(die => {
+        // console.log(die)
+        die.position = { x: die.position.x, y: die.position.y, w: cell.w * 2, h: cell.h } 
+        // push to global arr so lifecycle can use it
+        dicePositions.push(die)
+        p5.rect(die.position.x, die.position.y, cell.w * 2, cell.h)
+        p5.text(die.val[0], die.position.x + 10, die.position.y + 10)
+        p5.text(die.val[1], die.position.x + cell.w + 10, die.position.y + 10)
+      })
     }
-
-    let rotation = 0;
   
     p5.setup = () => {
       p5.strokeCap(p5.SQUARE)
@@ -172,25 +194,49 @@ const borderWidth = 8
       console.log(props.data)
       if(dice && regions && rows ) {
         createBoard({ width, height: height - 300, rows})
-        createRegions({width, height: height - 300, rows, regions})
-        createDice({ dice })
+        createRegions({ width, height: height - 300, rows, regions })
+        createDice({ width, offsetTop: height- 300,dice })
       }
       // if (props.rotation) {
       //   rotation = (props.rotation * Math.PI) / 180;
       // }
     };
 
-  
-    p5.draw = () => {
-      // p5.background(256,256,256);
-      // console.log(p5)
+    p5.mouseClicked = () => {
+      // detect click
+      console.log(dicePositions)
+      dicePositions.forEach(die => {
+        console.log(die)
+        if (
+          p5.mouseX >= die.position.x &&
+          p5.mouseX <= die.position.x + die.position.w &&
+          p5.mouseY >= die.position.y &&
+          p5.mouseY <= die.position.y + die.position.h
+        ) {
+          // cell.onClick()
+          // console.log(die)
+          console.log(die)
+          die.awake = true
+        }
+      })
       
-      // p5.normalMaterial();
-      // p5.noStroke();
-      // p5.push();
-      // p5.rotateY(rotation);
-      // p5.box(100);
-      // p5.pop();
+    }
+    
+    p5.mouseReleased = () => {
+      const awakeDie = dicePositions.find(item => item.awake === true)
+      // go to bed
+      if(awakeDie) {
+        awakeDie.awake = false
+      }
+    }
+
+  
+    p5.mouseMoved = (e) => {
+      const awakeDie = dicePositions.find(item => item.awake === true)
+      if(awakeDie) {
+        console.log(e)
+        // console.log(awakeDie)
+      }
     };
   }
   
