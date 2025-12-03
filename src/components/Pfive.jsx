@@ -1,10 +1,13 @@
 import { ReactP5Wrapper } from "@p5-wrapper/react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import Board from './Board'
+import Dice from './Dice'
 import axios from "axios";  
   
 const cell = { w: 100, h: 100 }
 const dicePositions = []
 const borderWidth = 8
+const canvasSize = {w : 1000, h: 1000}
 
   /**
    * @param {import("p5")} p5
@@ -30,6 +33,7 @@ const borderWidth = 8
       if (!neighbors.bottom) p5.line(x, y + h, x + w, y + h)
       if (!neighbors.left)   p5.line(x, y, x, y + h)
 
+      // draw little connecting lines
       if (neighbors.top) {
         p5.line(x, y, x, y - borderWidth)
         p5.line(x + w, y, x + w, y - borderWidth)
@@ -49,31 +53,7 @@ const borderWidth = 8
       p5.pop()
     }
 
-    const beefedUpDice = (dice) => {
-      console.log(dice)
-      const count = dice.length
-      const rows = [dice.slice(0,Math.ceil(count / 2)), dice.slice(Math.ceil(count / 2),count)]
-      console.log(rows)
-      const paddingX = 100
-      const paddingY = 50
-      const offsetTop = p5.height - 300 
-      const beefy = []
-      rows.forEach((row, rIndex) => {
-        row.forEach((die, dIndex) => {
-          beefy.push({ 
-            id: `${rIndex}-${dIndex}`,
-            val: die, 
-            position: { 
-              x: paddingX + (dIndex / (row.length + 1)) * p5.width, 
-              y: offsetTop + paddingY + (rIndex / (rows.length + 1)) * 300  
-            },
-            // awake is used to ignore dies that are inert - don't animate them in the onframe loop
-            awake: false
-          })
-        })
-      })
-      return beefy
-    }
+    
 
     const drawDiamond = ({ coords, left, top, text, color }) => {
       let minX = 999, minY = 999
@@ -81,15 +61,13 @@ const borderWidth = 8
         if(coord.x < minX) minX = coord.x
         if(coord.y < minY) minY = coord.y
       })
-      console.log({ minX, minY})
-      console.log(cell.w * minX )
       const x = left +  minX * cell.w + borderWidth
       const y = top + minY * cell.h + borderWidth
-      console.log({ x,y })
 
       p5.push()              
       p5.translate(x , y ) 
       p5.rotate(p5.radians(45))    
+      p5.b
       const darker = [
         color[0] * 0.8,
         color[1] * 0.8,
@@ -159,24 +137,24 @@ const borderWidth = 8
 
     }
 
-    const createDice = ({ width, offsetTop, dice }) => {
-      // console.log({ dice })
+    // const createDice = ({ width, offsetTop, dice }) => {
+    //   console.log(p5.props)
       
-      p5.push()
-      p5.line(0, offsetTop, p5.width, offsetTop)
+    //   p5.push()
+    //   p5.line(0, offsetTop, p5.width, offsetTop)
       
 
-      // call beefedUpDice to make it easier to work with
-      beefedUpDice(dice).forEach(die => {
-        // console.log(die)
-        die.position = { x: die.position.x, y: die.position.y, w: cell.w * 2, h: cell.h } 
-        // push to global arr so lifecycle can use it
-        dicePositions.push(die)
-        p5.rect(die.position.x, die.position.y, cell.w * 2, cell.h)
-        p5.text(die.val[0], die.position.x + 10, die.position.y + 10)
-        p5.text(die.val[1], die.position.x + cell.w + 10, die.position.y + 10)
-      })
-    }
+    //   // call beefedUpDice to make it easier to work with
+    //   beefedUpDice(dice).forEach(die => {
+    //     // console.log(die)
+    //     die.position = { x: die.position.x, y: die.position.y, w: cell.w * 2, h: cell.h } 
+    //     // push to global arr so lifecycle can use it
+    //     dicePositions.push(die)
+    //     p5.rect(die.position.x, die.position.y, cell.w * 2, cell.h)
+    //     p5.text(die.val[0], die.position.x + 10, die.position.y + 10)
+    //     p5.text(die.val[1], die.position.x + cell.w + 10, die.position.y + 10)
+    //   })
+    // }
   
     p5.setup = () => {
       p5.strokeCap(p5.SQUARE)
@@ -191,22 +169,24 @@ const borderWidth = 8
       // console.log(props)
       const { dice, regions, rows } = props.data
       const { width, height } = p5
-      console.log(props.data)
+      console.log(props)
       if(dice && regions && rows ) {
+        // props.beefedUpDice(dice)
         createBoard({ width, height: height - 300, rows})
         createRegions({ width, height: height - 300, rows, regions })
-        createDice({ width, offsetTop: height- 300,dice })
+        // beefedUpDice(dice)
+        // createDice({ width, offsetTop: height- 300,dice })
       }
       // if (props.rotation) {
       //   rotation = (props.rotation * Math.PI) / 180;
       // }
     };
 
-    p5.mouseClicked = () => {
+    // p5.mouse
+    p5.mousePressed = () => {
       // detect click
       console.log(dicePositions)
       dicePositions.forEach(die => {
-        console.log(die)
         if (
           p5.mouseX >= die.position.x &&
           p5.mouseX <= die.position.x + die.position.w &&
@@ -221,9 +201,19 @@ const borderWidth = 8
       })
       
     }
+    p5.mouseDragged = (e) => {
+      const awakeDie = dicePositions.find(item => item.awake === true)
+      if(awakeDie) {
+        console.log(e)
+        // console.log(awakeDie)
+        p5.rect(e.offsetX, e.offsetY, cell.w * 2, cell.h)
+      }
+    }
     
     p5.mouseReleased = () => {
+      console.log(`released`)
       const awakeDie = dicePositions.find(item => item.awake === true)
+      console.log(awakeDie)
       // go to bed
       if(awakeDie) {
         awakeDie.awake = false
@@ -232,16 +222,36 @@ const borderWidth = 8
 
   
     p5.mouseMoved = (e) => {
-      const awakeDie = dicePositions.find(item => item.awake === true)
-      if(awakeDie) {
-        console.log(e)
-        // console.log(awakeDie)
-      }
+      
     };
   }
   
 const Pfive = () => {
     const [data, setData] = useState({});
+    const dicePos = useRef([])
+
+    const beefedUpDice = (dice) => {
+      const count = dice.length
+      const rows = [dice.slice(0,Math.ceil(count / 2)), dice.slice(Math.ceil(count / 2),count)]
+      const paddingX = 100
+      const paddingY = 50
+      const beefy = []
+      rows.forEach((row, rIndex) => {
+        row.forEach((die, dIndex) => {
+          beefy.push({ 
+            id: `${rIndex}-${dIndex}`,
+            val: die, 
+            position: { 
+              x: paddingX + (dIndex / (row.length + 1)) * canvasSize.w, 
+              y: paddingY + (rIndex / (rows.length + 1)) * 300  
+            },
+            // awake is used to ignore dies that are inert - don't animate them in the onframe loop
+            awake: false
+          })
+        })
+      })
+      return beefy
+    }
   
     useEffect(() => {
       const request = async() => {
@@ -251,7 +261,8 @@ const Pfive = () => {
         const d = res.data
         if(d) {
           const gameData = { dice: JSON.parse(d.dice), regions: JSON.parse(d.regions), rows: JSON.parse(d.rows) }
-          console.log({ gameData})
+          // console.log({ gameData})
+          dicePos.current = beefedUpDice(gameData.dice)
           setData(gameData)
         }
 
@@ -262,7 +273,12 @@ const Pfive = () => {
 
     }, []);
   
-    return <ReactP5Wrapper sketch={sketch} data={data} />;
+    return (
+    <>
+    <Board regions={data.regions ? data.regions : []} rows={data.rows ? data.rows : []} />
+    <Dice dice={data.dice ? data.dice : []} />
+    </>
+    )
   }
 
   export default Pfive
