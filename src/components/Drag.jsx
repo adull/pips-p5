@@ -38,6 +38,8 @@ export const Drag = ({ children, onDragEnd, rotate, dragConstraints }) => {
   };
 
   const handlePointerDown = (event) => {
+    document.body.style.cursor = 'grabbing'
+
     const el = event.currentTarget;
     el.setPointerCapture(event.pointerId);
 
@@ -69,6 +71,8 @@ export const Drag = ({ children, onDragEnd, rotate, dragConstraints }) => {
   };
 
   const handlePointerUp = (event) => {
+    document.body.style.cursor = 'grab'
+
     const state = dragStateRef.current;
     console.log(state)
     if (state.pointerId !== event.pointerId) return;
@@ -77,12 +81,15 @@ export const Drag = ({ children, onDragEnd, rotate, dragConstraints }) => {
     state.isDragging = false;
     onDragEnd(event)
 
-    // console.log(getBoard())
 
   };
 
   const handlePointerEnter = (event) => {
-    window.style.cursor = 'dragging'
+    document.body.style.cursor = 'grab'
+  }
+
+  const handlePointerLeave = (event) => {
+    document.body.style.cursor = 'default'
   }
 
   return (
@@ -95,6 +102,7 @@ export const Drag = ({ children, onDragEnd, rotate, dragConstraints }) => {
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
         onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave}
       >
         {children}
       </motion.div>
