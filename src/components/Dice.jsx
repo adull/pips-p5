@@ -4,7 +4,7 @@ import Pip from './Pip'
 import { useEffect, useRef } from "react"
 import { pushToOriginalDicePos } from '../helpers/dice'
 
-const Dice = ({ dice, setDice, height, width, parent }) => {
+const Dice = ({ dice, setDice, id, height, width, parent }) => {
     // console.log({ dice })
     // return ( 
         
@@ -49,9 +49,10 @@ const Dice = ({ dice, setDice, height, width, parent }) => {
     return (
         <div className="flex flex-wrap justify-center items-center space-between" style={{height, width}}>
             {dice.map((die, index) => {
+                console.log(die)
                 return (
                     <div ref={el => { initRef(el, index) }} key={index}>
-                    <Drag style={{transform: `rotate(${die.rotation * 90}deg)`}} dragConstraints={parent} onDragEnd={(e) => mouseUp(e, index)} rotate={(e) => rotate(e, index)}>
+                    <Drag style={{transform: `rotate(${die.rotation * 90}deg)`}} id={die.index} dragConstraints={parent} onDragEnd={(e) => mouseUp(e, index)} rotate={(e) => rotate(e, index)}>
                         <div className="flex justify-center bg-white ml-1 mr-1 border b-1"
                              style={{width: 200, height: 100}}
                         >

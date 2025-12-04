@@ -1,8 +1,9 @@
 import React, { useRef } from "react";
 import { motion, useMotionValue, animate } from "motion/react";
 import { getBoard, getOffset } from "../helpers/board";
+import { getOriginalDicePosWithId } from "../helpers/dice";
 
-export const Drag = ({ children, style, onDragEnd, rotate, dragConstraints }) => {
+export const Drag = ({ children, style, id, onDragEnd, rotate, dragConstraints }) => {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const actualPosRef = useRef()
@@ -91,9 +92,10 @@ export const Drag = ({ children, style, onDragEnd, rotate, dragConstraints }) =>
 
     if(!dragStateRef.current.hasMoved) rotate(event)
 
+    const offset = getOffset()
     const getOverlapPercent = (die, cell) => {
       
-      const offset = getOffset()
+      
       const offsetDie = {
         top: die.top - offset.y,
         bottom: die.bottom - offset.y,
@@ -120,7 +122,6 @@ export const Drag = ({ children, style, onDragEnd, rotate, dragConstraints }) =>
     }));
 
     const droppedIds = results.filter(item => item.overlap > 50).map(item => item.id)
-    console.log({ droppedIds})
     if(droppedIds.length < 2) {
       animateTo(0,0)
     }
@@ -144,13 +145,20 @@ export const Drag = ({ children, style, onDragEnd, rotate, dragConstraints }) =>
     }
     // console.log(boardPositions)
     const target = boardPositions.find(item => item.id === firstCell)
+    console.log({target})
     if(!target) {
       animateTo(0,0)
     }
-    
-    console.log(target)
 
-    // animateTo(-5, -5)
+
+    // console.log(id)
+    const pos = getOriginalDicePosWithId(id)
+    const diff = {x: pos.rect.x - offset.x - target.x, y: pos.rect.y - offset.y - target.y}
+    // console.log({ pos, offset, target})
+    console.log({ diff })
+    animateTo(diff.x * -1, diff.y * -1)
+
+    
 
 
     // console.log({ results })
