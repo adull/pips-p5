@@ -47,17 +47,23 @@ const Dice = ({ dice, setDice, id, height, width, parent }) => {
         }
     }
     return (
-        <div className="flex flex-wrap justify-center items-center space-between" style={{height, width}}>
+        <div className="flex flex-wrap justify-around items-center space-around flex-wrap" style={{height, width}}>
             {dice.map((die, index) => {
                 console.log(die)
+                const style = {
+                    transform: `rotate(${die.rotation * 90}deg)`,
+                    transformOrigin: `50px 50px 0px`,
+                    left: die.rotation % 4 === 2 ? 100 : 0,
+                    position: `relative`
+                }
                 return (
                     <div ref={el => { initRef(el, index) }} key={index}>
-                    <Drag style={{transform: `rotate(${die.rotation * 90}deg)`}} id={die.index} dragConstraints={parent} onDragEnd={(e) => mouseUp(e, index)} rotate={(e) => rotate(e, index)}>
-                        <div className="flex justify-center bg-white ml-1 mr-1 border b-1"
+                    <Drag style={style} id={die.index} dragConstraints={parent} onDragEnd={(e) => mouseUp(e, index)} rotate={(e) => rotate(e, index)}>
+                        <div className="flex justify-center bg-white border b-1"
                              style={{width: 200, height: 100}}
                         >
-                            <Pip first={true} val={die[0]} />
-                            <Pip first={false} val={die[1]} />
+                            <Pip first={true} val={die.val[0]} />
+                            <Pip first={false} val={die.val[1]} />
                         </div>
                     </Drag>
                     </div>
