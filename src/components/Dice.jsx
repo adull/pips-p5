@@ -52,7 +52,7 @@ const Dice = ({ dice, setDice, height, width, parent }) => {
                 return (
                     <div ref={el => { initRef(el, index) }} key={index}>
                     <Drag style={{transform: `rotate(${die.rotation * 90}deg)`}} dragConstraints={parent} onDragEnd={(e) => mouseUp(e, index)} rotate={(e) => rotate(e, index)}>
-                        <div className="flex justify-center bg-white ml-2 border b-1"
+                        <div className="flex justify-center bg-white ml-1 mr-1 border b-1"
                              style={{width: 200, height: 100}}
                         >
                             <Pip first={true} val={die[0]} />

@@ -86,35 +86,30 @@ export const Drag = ({ children, style, onDragEnd, rotate, dragConstraints }) =>
 
     event.currentTarget.releasePointerCapture(event.pointerId);
     state.isDragging = false;
-    // onDragEnd(event)
-    // console.log(actualPosRef.current)
     const diePos = actualPosRef.current.getBoundingClientRect()
     const boardPositions = getBoard()
-    const offset = getOffset()
 
-    // console.log({ boardPositions})
-    // console.log({ itemRect})
-    // const ok = {...itemRect}
-    // console.log(itemRect)
-    // itemRect.left = itemRect.left - offset.x
-    // itemRect.x = itemRect.x - offset.x
-    // itemRect.top = itemRect.top - offset.y
-    // itemRect.y = itemRect.y - offset.y
+    if(!dragStateRef.current.hasMoved) rotate(event)
 
     const getOverlapPercent = (die, cell) => {
-      console.log({ cell, die })
+      
+      const offset = getOffset()
+      const offsetDie = {
+        top: die.top - offset.y,
+        bottom: die.bottom - offset.y,
+        left: die.left - offset.x,
+        right: die.right - offset.x
+      }
       const cellArea = die.width * die.height;
       if (cellArea === 0) return 0;
     
-      const ix = Math.max(0, Math.min(die.right, cell.x + cell.w) - Math.max(die.left, cell.x));
-      const iy = Math.max(0, Math.min(die.bottom, cell.y + cell.h) - Math.max(die.top, cell.y));
-      // const ix = cell.x - die.right
+      const ix = Math.max(0, Math.min(offsetDie.right, cell.x + cell.w) - Math.max(offsetDie.left, cell.x));
+      const iy = Math.max(0, Math.min(offsetDie.bottom, cell.y + cell.h) - Math.max(offsetDie.top, cell.y));
 
       
     
       const intersectionArea = ix * iy;
-      const val = (intersectionArea / cellArea) * 100;
-      console.log(cell.id, val)
+      const val = (intersectionArea / cellArea) * 200;
       return val
       
     }
@@ -124,9 +119,43 @@ export const Drag = ({ children, style, onDragEnd, rotate, dragConstraints }) =>
       overlap: getOverlapPercent(diePos, cell)
     }));
 
-    console.log({ results })
+    const droppedIds = results.filter(item => item.overlap > 50).map(item => item.id)
+    console.log({ droppedIds})
+    if(droppedIds.length < 2) {
+      animateTo(0,0)
+    }
 
-    if(!dragStateRef.current.hasMoved) rotate(event)
+    const smallestCell = (ids) => {
+      let smallestVal = Infinity
+      let smallestId = ''
+      ids.forEach(id => {
+        const vals = id.split('-')
+        const sum = vals[0] + vals[1]
+        if(sum < smallestVal) {
+          smallestVal = sum
+          smallestId = id
+        }
+      })
+      return smallestId
+    }
+    const firstCell = smallestCell(droppedIds)
+    if(!firstCell) {
+      animateTo(0,0)
+    }
+    // console.log(boardPositions)
+    const target = boardPositions.find(item => item.id === firstCell)
+    if(!target) {
+      animateTo(0,0)
+    }
+    
+    console.log(target)
+
+    // animateTo(-5, -5)
+
+
+    // console.log({ results })
+
+    
   };
 
   const handlePointerEnter = (event) => {
