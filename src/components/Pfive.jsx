@@ -29,6 +29,7 @@ const getPadding = ({ width, height, rows }) => {
       for(let i = 0; i < rows.length; i ++) {
         for(let j = 0; j < rows[i].length; j ++) {
           if(rows[i][j]) {
+            p5.fill(256,256,256,128)
             p5.rect(lPadding + (j * cell.w) , tPadding + (i * cell.h), cell.w, cell.h  )
             const square = {
               id: `${i}-${j}`,

@@ -1,9 +1,11 @@
-import React, { useRef } from "react";
+import React, { useState, useRef } from "react";
 import { motion, useMotionValue, animate } from "motion/react";
 import { getBoard, getOffset } from "../helpers/board";
 import { getOriginalDicePosWithId } from "../helpers/dice";
 
 export const Drag = ({ children, style, id, onDragEnd, rotate, dragConstraints }) => {
+  const [isDragging, setIsDragging] = useState(false)
+
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const actualPosRef = useRef()
@@ -63,6 +65,7 @@ export const Drag = ({ children, style, id, onDragEnd, rotate, dragConstraints }
   const handlePointerMove = (event) => {
     const state = dragStateRef.current;
     if (!state.isDragging || state.pointerId !== event.pointerId) return;
+    setIsDragging(true)
 
     const deltaX = event.clientX - state.startPointerX;
     const deltaY = event.clientY - state.startPointerY;
@@ -84,6 +87,7 @@ export const Drag = ({ children, style, id, onDragEnd, rotate, dragConstraints }
 
     const state = dragStateRef.current;
     if (state.pointerId !== event.pointerId) return;
+    setIsDragging(false)
 
     event.currentTarget.releasePointerCapture(event.pointerId);
     state.isDragging = false;
@@ -174,6 +178,10 @@ export const Drag = ({ children, style, id, onDragEnd, rotate, dragConstraints }
     document.body.style.cursor = 'default'
   }
 
+  const concatStyle = {
+    ...style,
+    opacity: isDragging ? 0.5 : 1
+  }
   return (
       <motion.div
         style={{ x, y, }}
@@ -185,7 +193,7 @@ export const Drag = ({ children, style, id, onDragEnd, rotate, dragConstraints }
         onPointerEnter={handlePointerEnter}
         onPointerLeave={handlePointerLeave}
       >
-        <div style={{...style}} ref={actualPosRef}>
+        <div style={{...concatStyle}} ref={actualPosRef}>
         {children}
         </div>
       </motion.div>
