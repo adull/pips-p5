@@ -54,7 +54,9 @@ const Dice = ({ dice, setDice, id, height, width, parent }) => {
                     transform: `rotate(${die.rotation * 90}deg)`,
                     transformOrigin: `50px 50px 0px`,
                     left: die.rotation % 4 === 2 ? 100 : 0,
-                    position: `relative`
+                    top: die.rotation % 4 === 3 ? 100 : 0,
+                    position: `relative`,
+                    transition: '0.4s cubic-bezier(0.24, -0.9, 0.59, 1.44) all'
                 }
                 return (
                     <div ref={el => { initRef(el, index) }} key={index}>
