@@ -1,7 +1,8 @@
 import React, { useRef } from "react";
 import { motion, useMotionValue, animate } from "motion/react";
+import { getBoard } from "../helpers/board";
 
-export const Drag = ({ children }) => {
+export const Drag = ({ children, onDragEnd, rotate, dragConstraints }) => {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
 
@@ -69,10 +70,14 @@ export const Drag = ({ children }) => {
 
   const handlePointerUp = (event) => {
     const state = dragStateRef.current;
+    console.log(state)
     if (state.pointerId !== event.pointerId) return;
 
     event.currentTarget.releasePointerCapture(event.pointerId);
     state.isDragging = false;
+    onDragEnd(event)
+
+    // console.log(getBoard())
 
   };
 
@@ -83,7 +88,9 @@ export const Drag = ({ children }) => {
   return (
       <motion.div
         style={{ x, y }}
+        dragConstraints={dragConstraints}
         onPointerDown={handlePointerDown}
+        onClick={rotate}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}

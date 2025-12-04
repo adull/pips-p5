@@ -3,7 +3,7 @@ import { Drag } from './Drag'
 import Pip from './Pip'
 
 const Dice = ({ first, val }) => {
-    console.log({ val })
+    // console.log({ val })
     // return ( 
         
     // )
