@@ -4,6 +4,7 @@ import Dice from "./Dice"
 import axios from "axios";  
 
 import { getCellSize, setCellSize } from "../helpers/cell"
+import { setOffset } from "../helpers/board";
 import { pushToBoard } from "../helpers/board";
   
 let cell = getCellSize()
@@ -52,7 +53,6 @@ const getPadding = ({ width, height, rows }) => {
     p5.updateWithProps = props => {
       const { rows } = props.data
       const { width, height } = p5
-      console.log(props.data)
       if(rows) {
         createBoard({ width, height: height - 300, rows})
       }
@@ -108,7 +108,6 @@ const regionSketch = (p5) => {
     const { tPadding, lPadding } = getPadding({ width, height, rows })
     regions.forEach(region => {
       const { coordinates: coords = region.coordinates, computedValue: val = region.computedValue } = region
-      console.log(coords)
       const color = getColor({ type: val })
 
       coords.forEach(coord => {
@@ -138,11 +137,8 @@ const regionSketch = (p5) => {
       if(coord.x < minX) minX = coord.x
       if(coord.y < minY) minY = coord.y
     })
-    console.log({ minX, minY})
-    console.log(cell.w * minX )
     const x = left +  minX * cell.w + borderWidth
     const y = top + minY * cell.h + borderWidth
-    console.log({ x,y })
 
     p5.push()              
     p5.translate(x , y ) 
@@ -181,9 +177,7 @@ const regionSketch = (p5) => {
   }
 
   p5.updateWithProps = (props) => {
-    console.log(props)
     const { rows, regions } = props.data
-    console.log({ rows, regions })
     const { width, height } = p5
     if(rows && regions) {
       createRegions({ width, height: height - 300, rows, regions })
@@ -198,6 +192,11 @@ const Pfive = () => {
     const wrapperRef = useRef()
     const [dicePositions, setDicePositions] = useState([])
 
+    if(wrapperRef.current) {
+      const rect = wrapperRef.current.getBoundingClientRect()
+      setOffset({ x: rect.x, y: rect.y })
+    }
+
     
   
     useEffect(() => {
@@ -209,9 +208,7 @@ const Pfive = () => {
         if(d) {
           const dice = JSON.parse(d.dice)
           const gameData = { dice, regions: JSON.parse(d.regions), rows: JSON.parse(d.rows) }
-          console.log({ gameData})
           setData(gameData)
-          // setDicePositions(beefedUpDice(dice))
           setDicePositions(dice.map((item, index) => { return { index, val: item, rotation: 0 } }))
         }
 
@@ -230,7 +227,7 @@ const Pfive = () => {
           <ReactP5Wrapper sketch={regionSketch} data={data} />
         </div>
         <div className="absolute bottom-0" style={{height: 300}}>
-          <Dice dice={dicePositions} height={300} width={1000} parent={wrapperRef} />
+          <Dice dice={dicePositions} setDice={setDicePositions} height={300} width={1000} parent={wrapperRef} />
         </div>
         
       </div>
