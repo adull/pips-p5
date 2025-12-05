@@ -1,22 +1,20 @@
-import { motion } from "motion/react"
+// import { motion } from "motion/react"
 import { Drag } from './Drag'
 import Pip from './Pip'
-import { useEffect, useRef } from "react"
+import { useRef } from "react"
 import { pushToOriginalDicePos } from '../helpers/dice'
 import { getBoard, addValToCell } from "../helpers/board";
 import { getCellSize } from "../helpers/cell"
 
-const Dice = ({ dice, setDice, id, height, width, parent }) => {
+const Dice = ({ dice, setDice, height, width, parent }) => {
     const cellSize = getCellSize()
     const diceRefs = useRef(Array.from(dice, _ => null))
 
     const pushToBoard = (ids, die) => {
         console.log({ids, die})
 
-        const valOne = die.rotation < 2 ? die.val[0] : die.val[1]
-        const valTwo = die.rotation < 2 ? die.val[1] : die.val[0]
-
-        console.log({valOne, valTwo})
+        const valOne = die.rotation % 4 < 2 ? die.val[0] : die.val[1]
+        const valTwo = die.rotation % 4 <  2 ? die.val[1] : die.val[0]
 
         addValToCell(valOne, ids[0])
         addValToCell(valTwo, ids[1])
@@ -29,7 +27,7 @@ const Dice = ({ dice, setDice, id, height, width, parent }) => {
         setDice(prev => {
             return prev.map((item, i) => {
                 if(i === index) {
-                    const nextRotation = item.rotation + 1 % 4
+                    const nextRotation = item.rotation + 1
                     return { ...item, rotation: nextRotation }
                 }
                 return item

@@ -142,6 +142,7 @@ export const Drag = ({ children, style, id, pushToBoard, rotate, dragConstraints
     }
 
     const droppedIds = results.filter(item => item.overlap > 50).map(item => item.id)
+    console.log({ droppedIds})
     if(droppedIds.length < 2) {
       return resetAfterDrop()
       
@@ -182,14 +183,20 @@ export const Drag = ({ children, style, id, pushToBoard, rotate, dragConstraints
       return resetAfterDrop()
     }
 
-
-    // console.log(id)
     const pos = getOriginalDicePosWithId(id)
-    const diff = {x: pos.rect.x - offset.x - target.x, y: pos.rect.y - offset.y - target.y}
+    console.log({ pos })
+    console.log({ offset })
+    // const diff = {x: pos.rect.x - offset.x - target.x, y: (pos.rect.y - offset.y - target.y)}
+    const diff = {
+      x: pos.rect.x - offset.x - target.x, 
+      y: (pos.rect.y * -1 - offset.y - target.y)
+    }
+
     dragStateRef.current = {
       ...dragStateRef.current,
       positionOnBoard: droppedIds
     }
+    console.log(diff.x * -1, diff.y * -1)
     animateTo(diff.x * -1, diff.y * -1)
 
     checkIfWon()
@@ -225,15 +232,13 @@ export const Drag = ({ children, style, id, pushToBoard, rotate, dragConstraints
     if(!boardFull) return
 
     const regions = getRegions()
-    console.log({ regions })
     let allRegionsSatisfied = true
     regions.forEach(region => {
       
       const op = region.computedValue[0]
       const rest = region.computedValue.slice(1)
-      console.log({ op, rest })
       const items = getValsInRegion(region.coordinates)
-      console.log(sum(items))
+      console.log({ items })
       if (op === "<") {
         if(sum(items) >= parseInt(rest)) {
           console.log(`error`)
@@ -250,6 +255,7 @@ export const Drag = ({ children, style, id, pushToBoard, rotate, dragConstraints
         const s = new Set(items)
         const dupArr = [...s]
         if(dupArr.length > 1 ) {
+          console.log({dupArr})
           console.log(`error`)
           allRegionsSatisfied = false
           return 
@@ -257,15 +263,15 @@ export const Drag = ({ children, style, id, pushToBoard, rotate, dragConstraints
       } else if(op === "≠") {
         const s = new Set(items)
         const dupArr = [...s]
-        if(s.length !== dupArr.length) {
+        if(items.length !== dupArr.length) {
           console.log(`error`)
           allRegionsSatisfied = false
           return
         }
       } else {
         if(sum(items) !== parseInt(region.computedValue)) {
-          console.log(region)
-          console.log(sum(items), region.computedValue)
+          console.log(sum(items))
+          console.log(parseInt(region.computedValue))
           console.log(`error`)
           allRegionsSatisfied = false
           return
