@@ -1,9 +1,10 @@
 import React, { useState, useRef } from "react";
 import { motion, useMotionValue, animate } from "motion/react";
-import { getBoard, getOffset } from "../helpers/board";
+import { getBoard, getOffset, getValFromCell, addValToCell } from "../helpers/board";
 import { getOriginalDicePosWithId } from "../helpers/dice";
+import { getRegions } from "../helpers/regions";
 
-export const Drag = ({ children, style, id, onDragEnd, rotate, dragConstraints }) => {
+export const Drag = ({ children, style, id, pushToBoard, rotate, dragConstraints }) => {
   const [isDragging, setIsDragging] = useState(false)
 
   const x = useMotionValue(0);
@@ -17,7 +18,8 @@ export const Drag = ({ children, style, id, onDragEnd, rotate, dragConstraints }
     startX: 0,
     startY: 0,
     isDragging: false,
-    hasMoved: false
+    hasMoved: false,
+    positionOnBoard: []
   });
 
   const animXRef = useRef(null);
@@ -49,6 +51,7 @@ export const Drag = ({ children, style, id, onDragEnd, rotate, dragConstraints }
     el.setPointerCapture(event.pointerId);
 
     dragStateRef.current = {
+      ...dragStateRef.current,
       pointerId: event.pointerId,
       startPointerX: event.clientX,
       startPointerY: event.clientY,
@@ -57,6 +60,11 @@ export const Drag = ({ children, style, id, onDragEnd, rotate, dragConstraints }
       isDragging: true,
       hasMoved: false
     };
+
+    const toReset = dragStateRef.current.positionOnBoard
+    toReset.forEach(id => {
+      addValToCell('', id)
+    })
 
     if (animXRef.current) animXRef.current.stop();
     if (animYRef.current) animYRef.current.stop();
@@ -94,7 +102,7 @@ export const Drag = ({ children, style, id, onDragEnd, rotate, dragConstraints }
     const diePos = actualPosRef.current.getBoundingClientRect()
     const boardPositions = getBoard()
 
-    if(!dragStateRef.current.hasMoved) rotate(event)
+    if(!state.hasMoved && !state.positionOnBoard.length > 0) rotate(event)
 
     const offset = getOffset()
     const getOverlapPercent = (die, cell) => {
@@ -125,9 +133,29 @@ export const Drag = ({ children, style, id, onDragEnd, rotate, dragConstraints }
       overlap: getOverlapPercent(diePos, cell)
     }));
 
+    const resetAfterDrop = () => {
+      dragStateRef.current = {
+        ...dragStateRef.current,
+        positionOnBoard: []
+      }
+      return animateTo(0,0)
+    }
+
     const droppedIds = results.filter(item => item.overlap > 50).map(item => item.id)
     if(droppedIds.length < 2) {
-      animateTo(0,0)
+      return resetAfterDrop()
+      
+    }
+
+    let bothEmpty = true
+    droppedIds.forEach(id => {
+      bothEmpty = bothEmpty && (getValFromCell(id) === '') 
+    })
+    // console.log({ bothEmpty })
+    if(bothEmpty) {
+      pushToBoard(droppedIds)
+    } else {
+      return resetAfterDrop()
     }
 
     const smallestCell = (ids) => {
@@ -145,29 +173,26 @@ export const Drag = ({ children, style, id, onDragEnd, rotate, dragConstraints }
     }
     const firstCell = smallestCell(droppedIds)
     if(!firstCell) {
-      animateTo(0,0)
+      return resetAfterDrop()
+      
     }
-    // console.log(boardPositions)
+
     const target = boardPositions.find(item => item.id === firstCell)
-    console.log({target})
     if(!target) {
-      animateTo(0,0)
+      return resetAfterDrop()
     }
 
 
     // console.log(id)
     const pos = getOriginalDicePosWithId(id)
     const diff = {x: pos.rect.x - offset.x - target.x, y: pos.rect.y - offset.y - target.y}
-    // console.log({ pos, offset, target})
-    console.log({ diff })
+    dragStateRef.current = {
+      ...dragStateRef.current,
+      positionOnBoard: droppedIds
+    }
     animateTo(diff.x * -1, diff.y * -1)
 
-    
-
-
-    // console.log({ results })
-
-    
+    checkIfWon()
   };
 
   const handlePointerEnter = (event) => {
@@ -176,6 +201,87 @@ export const Drag = ({ children, style, id, onDragEnd, rotate, dragConstraints }
 
   const handlePointerLeave = (event) => {
     document.body.style.cursor = 'default'
+  }
+
+  const getValsInRegion = (coordinates) => {
+    const vals = []
+    coordinates.forEach(coord => {
+      const id = `${coord.y}-${coord.x}`
+      vals.push(getValFromCell(id))
+    })
+    return vals
+  }
+
+  const sum = (arr) => {
+    let s = 0
+    arr.forEach(item => s += item)
+    return s
+  }
+
+  const checkIfWon = () => {
+    const boardPositions = getBoard()
+    const boardFull = boardPositions.every(item => item.val !== '')
+    // UNCOMMENT THIS
+    if(!boardFull) return
+
+    const regions = getRegions()
+    console.log({ regions })
+    let allRegionsSatisfied = true
+    regions.forEach(region => {
+      
+      const op = region.computedValue[0]
+      const rest = region.computedValue.slice(1)
+      console.log({ op, rest })
+      const items = getValsInRegion(region.coordinates)
+      console.log(sum(items))
+      if (op === "<") {
+        if(sum(items) >= parseInt(rest)) {
+          console.log(`error`)
+          allRegionsSatisfied = false
+          return
+        }
+      } else if (op === ">") {
+        if(sum(items) <= parseInt(rest)) {
+          console.log(`error`)
+          allRegionsSatisfied = false
+          return
+        }
+      } else if(op === "=") {
+        const s = new Set(items)
+        const dupArr = [...s]
+        if(dupArr.length > 1 ) {
+          console.log(`error`)
+          allRegionsSatisfied = false
+          return 
+        }
+      } else if(op === "≠") {
+        const s = new Set(items)
+        const dupArr = [...s]
+        if(s.length !== dupArr.length) {
+          console.log(`error`)
+          allRegionsSatisfied = false
+          return
+        }
+      } else {
+        if(sum(items) !== parseInt(region.computedValue)) {
+          console.log(region)
+          console.log(sum(items), region.computedValue)
+          console.log(`error`)
+          allRegionsSatisfied = false
+          return
+        }
+      }
+      // if (c === "=") return [110, 150, 170] // visible blue-teal
+      // if (c === "≠") return [120, 170, 140] // gentle emerald green
+      // return [200, 120, 90] // low-sat orange-red
+    })
+    if(allRegionsSatisfied) {
+      // settimeout cuz animation
+      setTimeout(() => alert('You won!'), 500)
+    } else {
+      setTimeout(() => alert('Error'), 500)
+    }
+    // }
   }
 
   const concatStyle = {

@@ -5,6 +5,7 @@ import axios from "axios";
 
 import { getCellSize, setCellSize } from "../helpers/cell"
 import { setOffset } from "../helpers/board";
+import { setRegions } from "../helpers/regions";
 import { pushToBoard } from "../helpers/board";
   
 let cell = getCellSize()
@@ -210,6 +211,7 @@ const Pfive = () => {
           const dice = JSON.parse(d.dice)
           const gameData = { dice, regions: JSON.parse(d.regions), rows: JSON.parse(d.rows) }
           setData(gameData)
+          setRegions(JSON.parse(d.regions))
           setDicePositions(dice.map((item, index) => { return { index, val: item, rotation: 0 } }))
         }
 

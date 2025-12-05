@@ -9,11 +9,6 @@ import five from '../assets/5.png'
 import six from '../assets/6.png'
 
 const Pip = ({ first, val }) => {
-    console.log({ val })
-    // return ( 
-        
-    // )
-
     const map = {
         0: zero,
         1: one,
@@ -23,7 +18,6 @@ const Pip = ({ first, val }) => {
         5: five,
         6: six
     }
-    console.log(val)
 
     return (
         <div className={`flex flex-wrap justify-center items-center ${first ? `border-r-1` : ``}`} >

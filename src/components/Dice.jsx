@@ -3,29 +3,27 @@ import { Drag } from './Drag'
 import Pip from './Pip'
 import { useEffect, useRef } from "react"
 import { pushToOriginalDicePos } from '../helpers/dice'
+import { getBoard, addValToCell } from "../helpers/board";
+import { getCellSize } from "../helpers/cell"
 
 const Dice = ({ dice, setDice, id, height, width, parent }) => {
-    // console.log({ dice })
-    // return ( 
-        
-    // )
-    // console.log(Array.from(dice, x => null))
+    const cellSize = getCellSize()
     const diceRefs = useRef(Array.from(dice, _ => null))
-    // console.log(diceRefs)
-    const mouseUp = (e, index) => {
-        // console.log(e)
-        // console.log(diceRefs)
-        // console.log(diceRefs.current[index])
-        console.log(dice[index])
-        const item = diceRefs.current[index]
-        console.log({item: item.getBoundingClientRect() })
-        // const pos = {x: item.cl}
-        
-    }
 
-    useEffect(() => {
-        console.log({dice})
-    }, [dice])
+    const pushToBoard = (ids, die) => {
+        console.log({ids, die})
+
+        const valOne = die.rotation < 2 ? die.val[0] : die.val[1]
+        const valTwo = die.rotation < 2 ? die.val[1] : die.val[0]
+
+        console.log({valOne, valTwo})
+
+        addValToCell(valOne, ids[0])
+        addValToCell(valTwo, ids[1])
+
+        const board = getBoard()
+        console.log({ board })
+    }
 
     const rotate = (e, index) => {
         setDice(prev => {
@@ -49,20 +47,19 @@ const Dice = ({ dice, setDice, id, height, width, parent }) => {
     return (
         <div className="flex flex-wrap justify-around items-center space-around flex-wrap" style={{height, width}}>
             {dice.map((die, index) => {
-                console.log(die)
                 const style = {
                     transform: `rotate(${die.rotation * 90}deg)`,
-                    transformOrigin: `50px 50px 0px`,
-                    left: die.rotation % 4 === 2 ? 100 : 0,
-                    top: die.rotation % 4 === 3 ? 100 : 0,
+                    transformOrigin: `${cellSize.w / 2}px ${cellSize.w / 2}px 0px`,
+                    left: die.rotation % 4 === 2 ? cellSize.w : 0,
+                    top: die.rotation % 4 === 3 ? cellSize.w : 0,
                     position: `relative`,
                     transition: '0.4s cubic-bezier(0.24, -0.9, 0.59, 1.44) all'
                 }
                 return (
                     <div ref={el => { initRef(el, index) }} key={index}>
-                    <Drag style={style} id={die.index} dragConstraints={parent} onDragEnd={(e) => mouseUp(e, index)} rotate={(e) => rotate(e, index)}>
+                    <Drag style={style} id={die.index} dragConstraints={parent} pushToBoard={(ids) => pushToBoard(ids, die)} rotate={(e) => rotate(e, index)} vals={die.val}>
                         <div className="flex justify-center bg-white border b-1"
-                             style={{width: 200, height: 100}}
+                             style={{width: cellSize.w * 2, height: cellSize.h}}
                         >
                             <Pip first={true} val={die.val[0]} />
                             <Pip first={false} val={die.val[1]} />
