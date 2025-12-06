@@ -185,11 +185,14 @@ export const Drag = ({ children, style, id, pushToBoard, rotate, dragConstraints
 
     const pos = getOriginalDicePosWithId(id)
     console.log({ pos })
-    console.log({ offset })
+    // console.log({ offset })
+    const lol = offset.y + 1319 + pos.rect.y
+    console.log({ lol })
+    console.log({target })
     // const diff = {x: pos.rect.x - offset.x - target.x, y: (pos.rect.y - offset.y - target.y)}
     const diff = {
       x: pos.rect.x - offset.x - target.x, 
-      y: (pos.rect.y * -1 - offset.y - target.y)
+      y: (1319 -  offset.y - target.y)
     }
 
     dragStateRef.current = {

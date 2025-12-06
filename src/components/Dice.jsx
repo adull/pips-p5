@@ -1,12 +1,13 @@
 // import { motion } from "motion/react"
 import { Drag } from './Drag'
 import Pip from './Pip'
-import { useRef } from "react"
-import { pushToOriginalDicePos } from '../helpers/dice'
+import { useEffect, useRef } from "react"
+import { pushToOriginalDicePos, clearOriginalDicePos, getOriginalDicePos } from '../helpers/dice'
 import { getBoard, addValToCell } from "../helpers/board";
 import { getCellSize } from "../helpers/cell"
 
 const Dice = ({ dice, setDice, height, width, parent }) => {
+    console.log({ height, width})
     const cellSize = getCellSize()
     const diceRefs = useRef(Array.from(dice, _ => null))
 
@@ -35,12 +36,22 @@ const Dice = ({ dice, setDice, height, width, parent }) => {
         })
     }
 
+    useEffect(() => {
+        console.log(`newhw`)
+        console.log(width, height)
+        clearOriginalDicePos()
+        initRef()
+    }, [width, height])
+
     const initRef = (el, index) => {
         diceRefs.current[index] = el
         if(el) {
+            console.log({ el })
             const rect =  el.getBoundingClientRect()
+            console.log(rect)
             pushToOriginalDicePos({ id: index, rect })
         }
+        console.log(getOriginalDicePos())
     }
     return (
         <div className="flex flex-wrap justify-around items-center space-around flex-wrap" style={{height, width}}>

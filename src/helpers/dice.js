@@ -1,4 +1,4 @@
-const originalDicePos = []
+let originalDicePos = []
 
 const getOriginalDicePos = () => originalDicePos
 
@@ -6,4 +6,6 @@ const getOriginalDicePosWithId = (id) => originalDicePos.find(item => item.id ==
 
 const pushToOriginalDicePos = (item) => originalDicePos.push(item)
 
-export { getOriginalDicePos, getOriginalDicePosWithId, pushToOriginalDicePos }
+const clearOriginalDicePos = () => originalDicePos = []
+
+export { getOriginalDicePos, getOriginalDicePosWithId, pushToOriginalDicePos, clearOriginalDicePos }
