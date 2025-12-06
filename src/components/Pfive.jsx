@@ -69,7 +69,7 @@ const getPadding = ({ width, height, rows }) => {
             const newSize = minViewDim / (maxBoardDim + 2)
             console.log({ newSize})
             updateCellSize(newSize)
-            setCellSize(newSize)
+            setCellSize({w: newSize, h: newSize})
           }
           p5.resizeCanvas(w,h)
           const { width, height } = p5
@@ -219,7 +219,7 @@ const Pfive = () => {
     const wrapperRef = useRef()
     const [dicePositions, setDicePositions] = useState([])
     const [canvasSize, setCanvasSize] = useState({ w: -1, h: -1})
-    const [cellSize, setCellSize] = useState(1)
+    const [cellSize, setCellSize] = useState(getCellSize())
 
     if(wrapperRef.current) {
       const rect = wrapperRef.current.getBoundingClientRect()

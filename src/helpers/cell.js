@@ -1,4 +1,4 @@
-const cell = { w: 150, h: 150 }
+const cell = { w: 100, h: 100 }
 const getCellSize = () => cell
 
 const updateCellSize = (size) => { cell.w = size; cell.h = size; }

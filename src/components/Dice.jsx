@@ -45,10 +45,11 @@ const Dice = ({ dice, setDice, height, cellSize, width, parent }) => {
 
     return (
         <div className="flex flex-wrap justify-around items-center space-around flex-wrap" style={{height, width}}>
+            {console.log(cellSize)}
             {dice.map((die, index) => {
                 const style = {
                     transform: `rotate(${die.rotation * 90}deg)`,
-                    transformOrigin: `${cellSize / 2}px ${cellSize / 2}px 0px`,
+                    transformOrigin: `${cellSize.w / 2}px ${cellSize.w / 2}px 0px`,
                     left: die.rotation % 4 === 2 ? cellSize.w : 0,
                     top: die.rotation % 4 === 3 ? cellSize.w : 0,
                     position: `relative`,
@@ -58,7 +59,7 @@ const Dice = ({ dice, setDice, height, cellSize, width, parent }) => {
                     <div ref={el => { initRef(el, index) }} key={index}>
                     <Drag style={style} id={die.index} dragConstraints={parent} pushToBoard={(ids) => pushToBoard(ids, die)} rotate={(e) => rotate(e, index)} vals={die.val}>
                         <div className="flex justify-center bg-white border b-1"
-                             style={{width: cellSize * 2, height: cellSize}}
+                             style={{width: cellSize.w * 2, height: cellSize.w}}
                         >
                             <Pip first={true} val={die.val[0]} />
                             <Pip first={false} val={die.val[1]} />
