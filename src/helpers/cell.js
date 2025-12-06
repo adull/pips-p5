@@ -1,6 +1,6 @@
-const cell = { w: 80, h: 80}
+const cell = { w: 150, h: 150 }
 const getCellSize = () => cell
 
-const setCellSize = (size) => { cell.w = size; cell.h = size; }
+const updateCellSize = (size) => { cell.w = size; cell.h = size; }
 
-export { getCellSize, setCellSize }
+export { getCellSize, updateCellSize }

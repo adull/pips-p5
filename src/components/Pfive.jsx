@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Dice from "./Dice"
 import axios from "axios";  
 
-import { getCellSize, setCellSize } from "../helpers/cell"
+import { getCellSize, updateCellSize } from "../helpers/cell"
 import { setOffset } from "../helpers/board";
 import { setRegions } from "../helpers/regions";
 import { getBoard, pushToBoard } from "../helpers/board";
@@ -26,7 +26,6 @@ const getPadding = ({ width, height, rows }) => {
     
 
     const createBoard = ({ width, height, rows}) => {
-      console.log({ width, height, rows})
       const { tPadding, lPadding } = getPadding({ width, height, rows })
       for(let i = 0; i < rows.length; i ++) {
         for(let j = 0; j < rows[i].length; j ++) {
@@ -46,8 +45,6 @@ const getPadding = ({ width, height, rows }) => {
           }
         }
       }
-      console.log(p5.width, p5.height)
-      console.log(getBoard())
     }
   
     p5.setup = (props) => {
@@ -57,24 +54,27 @@ const getPadding = ({ width, height, rows }) => {
   
     p5.updateWithProps = props => {
       const {w, h} = props.canvasSize
+      const setCellSize = props.setCellSize
       const { rows } = props.data
       if(rows) {
         
         if(w  > 0 && h > 0) {
-          console.log(w, h, rows)
-
-          
+          console.log(getCellSize())
+          console.log(rows)
+          // find if rows or cols are bigger
+          const minViewDim = Math.min(w,h)
+          const maxBoardDim = Math.max(rows.length, rows[0].length)
+          console.log((maxBoardDim + 2) * cell.w, minViewDim)
+          if((maxBoardDim + 2) * cell.w > minViewDim) {
+            const newSize = minViewDim / (maxBoardDim + 2)
+            console.log({ newSize})
+            updateCellSize(newSize)
+            setCellSize(newSize)
+          }
           p5.resizeCanvas(w,h)
           const { width, height } = p5
-          console.log({ width, height})
           p5.background(200);
-
-          createBoard({ width, height: height - 300, rows})
-        
-          console.log(rows)
-          
-          
-          
+          createBoard({ width, height: height - 300, rows})  
         }
       }
       // const { width, height } = p5
@@ -219,6 +219,7 @@ const Pfive = () => {
     const wrapperRef = useRef()
     const [dicePositions, setDicePositions] = useState([])
     const [canvasSize, setCanvasSize] = useState({ w: -1, h: -1})
+    const [cellSize, setCellSize] = useState(1)
 
     if(wrapperRef.current) {
       const rect = wrapperRef.current.getBoundingClientRect()
@@ -258,13 +259,13 @@ const Pfive = () => {
     return (
       <div className="relative" ref={wrapperRef}>
         <div className="pointer-events-none relative top-0 left-0">
-          <ReactP5Wrapper sketch={boardSketch} data={data} canvasSize={canvasSize}/>
+          <ReactP5Wrapper sketch={boardSketch} data={data} canvasSize={canvasSize} setCellSize={setCellSize}/>
         </div>
         <div className="pointer-events-none absolute top-0 left-0" style={{zIndex: 999}}>
           <ReactP5Wrapper sketch={regionSketch} data={data} canvasSize={canvasSize}  />
         </div>
         <div className="absolute bottom-0" style={{height: 300}}>
-          <Dice dice={dicePositions} setDice={setDicePositions} height={300} width={canvasSize.w} parent={wrapperRef} />
+          <Dice dice={dicePositions} setDice={setDicePositions} cellSize={cellSize} height={300} width={canvasSize.w} parent={wrapperRef} />
         </div>
         
       </div>
