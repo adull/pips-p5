@@ -1,8 +1,6 @@
 import React, { useState, useRef } from "react";
 import { motion, useMotionValue, animate } from "motion/react";
-import { getBoard, getOffset, getValFromCell, addValToCell } from "../helpers/board";
-import { getOriginalDicePosWithId } from "../helpers/dice";
-import { getRegions } from "../helpers/regions";
+import { getBoard, getOffset, getValFromCell, addValToCell, getOriginalDicePosWithId, getRegions } from "../helpers";
 
 export const Drag = ({ children, style, id, pushToBoard, rotate, dragConstraints }) => {
   const [isDragging, setIsDragging] = useState(false)

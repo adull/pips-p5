@@ -2,9 +2,7 @@
 import { Drag } from './Drag'
 import Pip from './Pip'
 import { useEffect, useLayoutEffect, useRef } from "react"
-import { pushToOriginalDicePos, clearOriginalDicePos, getOriginalDicePos } from '../helpers/dice'
-import { getBoard, addValToCell } from "../helpers/board";
-import { getCellSize } from "../helpers/cell"
+import { pushToOriginalDicePos, addValToCell } from '../helpers'
 
 const Dice = ({ dice, setDice, height, cellSize, width, parent }) => {
     console.log(cellSize)

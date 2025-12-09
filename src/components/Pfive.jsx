@@ -1,12 +1,10 @@
 import { ReactP5Wrapper } from "@p5-wrapper/react";
 import React, { useEffect, useRef, useState } from "react";
 import Dice from "./Dice"
+import GameController from "./GameController"
 import axios from "axios";  
 
-import { getCellSize, updateCellSize } from "../helpers/cell"
-import { setOffset } from "../helpers/board";
-import { setRegions } from "../helpers/regions";
-import { getBoard, pushToBoard } from "../helpers/board";
+import { getCellSize, updateCellSize, setOffset, setRegions, pushToBoard } from "../helpers"
   
 let cell = getCellSize()
 // const dicePositions = []
@@ -258,10 +256,14 @@ const Pfive = () => {
   
     return (
       <div className="relative" ref={wrapperRef}>
+        
         <div className="pointer-events-none relative top-0 left-0">
           <ReactP5Wrapper sketch={boardSketch} data={data} canvasSize={canvasSize} setCellSize={setCellSize}/>
         </div>
-        <div className="pointer-events-none absolute top-0 left-0" style={{zIndex: 999}}>
+        <div className="absolute top-0 left-0" style={{ zIndex: 999 }}>
+          <GameController style={{width: canvasSize?.w, height: canvasSize?.h}} />
+        </div>
+        <div className="pointer-events-none absolute top-0 left-0" style={{zIndex: 99}}>
           <ReactP5Wrapper sketch={regionSketch} data={data} canvasSize={canvasSize}  />
         </div>
         <div className="absolute bottom-0" style={{height: 300}}>
