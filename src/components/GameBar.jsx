@@ -20,9 +20,6 @@ const GameBar = ({ style, isSolved, setMode, newPuzzle }) => {
         );
     };
 
-    useEffect(() => {
-        
-    }, [])
 
     useEffect(() => {
         
@@ -35,6 +32,12 @@ const GameBar = ({ style, isSolved, setMode, newPuzzle }) => {
 
         return () => clearInterval(interval);
     }, [isSolved])
+
+    const newPuzzleResetTime = () => {
+        setTime(0)
+        newPuzzle()
+    }
+
     return (
         <>
             <div className="flex">
@@ -43,7 +46,8 @@ const GameBar = ({ style, isSolved, setMode, newPuzzle }) => {
                 </div>
                 <div>{formatSeconds(time)}</div>
             </div>
-            {isSolved ? <WinnerModal time={formatSeconds(time)} style={style} newPuzzle={newPuzzle} /> : <></>}
+            <button onClick={newPuzzleResetTime}>new puz</button>
+            {isSolved ? <WinnerModal time={formatSeconds(time)} style={style} newPuzzle={newPuzzleResetTime} /> : <></>}
         </>
         
     );

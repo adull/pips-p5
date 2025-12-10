@@ -1,4 +1,5 @@
-import { leftBorder, rightBorder, pipsImg, sg, h2p } from '../helpers/img';
+import { pipsImg, sg, h2p } from '../helpers/img';
+import Borders from './Borders'
 
 const Home = ({ style, setMode }) => {
     return (
@@ -6,13 +7,8 @@ const Home = ({ style, setMode }) => {
             className="container mx-auto p-6 bg-white relative"
             style={{ ...style }}
             >
-            <div className="absolute top-0 left-0 h-full" >
-                <img src={leftBorder} className="object-contain h-full" />
-            </div>
-            <div className="absolute top-0 right-0 h-full" >
-                <img src={rightBorder} className="object-contain h-full" />
-            </div>
-            <div className="h-full w-full flex flex-col">
+            <Borders />
+            <div className="h-full w-full flex flex-col z-99 relative">
                 <div className="flex-1 flex items-center justify-center">
                     <img
                         src={pipsImg}

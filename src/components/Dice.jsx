@@ -4,9 +4,7 @@ import Pip from './Pip'
 import { useEffect, useLayoutEffect, useRef } from "react"
 import { pushToOriginalDicePos, addValToCell } from '../helpers'
 
-const Dice = ({ dice, setDice, setIsSolved, height, cellSize, width, parent }) => {
-    console.log(cellSize)
-    // const cellSize = getCellSize()
+const Dice = ({ dice, setDice, gameCount, setIsSolved, height, cellSize, width, parent }) => {
     const diceRefs = useRef(Array.from(dice, _ => null))
 
     const pushToBoard = (ids, die) => {
@@ -54,7 +52,7 @@ const Dice = ({ dice, setDice, setIsSolved, height, cellSize, width, parent }) =
                 }
                 return (
                     <div ref={el => { initRef(el, index) }} key={index}>
-                        <Drag style={style} id={die.index} dragConstraints={parent} setIsSolved={setIsSolved}
+                        <Drag style={style} id={die.index} dragConstraints={parent} gameCount={gameCount} setIsSolved={setIsSolved}
                               pushToBoard={(ids) => pushToBoard(ids, die)} rotate={(e) => rotate(e, index)} vals={die.val}
                         >
                             <div className="flex justify-center bg-white border b-1"

@@ -1,10 +1,14 @@
-import React, { useState, useRef, useContext } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 import { motion, useMotionValue, animate } from "motion/react";
 import { getBoard, getOffset, getValFromCell, addValToCell, getOriginalDicePosWithId, getRegions } from "../helpers";
-import GameContext from "../contexts/GameContext";
 
-export const Drag = ({ children, style, id, pushToBoard, rotate, dragConstraints, setIsSolved }) => {
+export const Drag = ({ children, style, id, pushToBoard, rotate, dragConstraints, gameCount, setIsSolved }) => {
   const [isDragging, setIsDragging] = useState(false)
+
+  useEffect(() => {
+    console.log(`animate to 0,0`)
+    animateTo(0,0)
+  }, [gameCount])
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -100,6 +104,7 @@ export const Drag = ({ children, style, id, pushToBoard, rotate, dragConstraints
     state.isDragging = false;
     const diePos = actualPosRef.current.getBoundingClientRect()
     const boardPositions = getBoard()
+    console.log({ boardPositions })
 
     if(!state.hasMoved && !state.positionOnBoard.length > 0) rotate(event)
 
@@ -156,6 +161,7 @@ export const Drag = ({ children, style, id, pushToBoard, rotate, dragConstraints
     } else {
       return resetAfterDrop()
     }
+    console.log(`ok so i get here,.,,.`)
 
     const smallestCell = (ids) => {
       let smallestVal = Infinity
@@ -175,12 +181,14 @@ export const Drag = ({ children, style, id, pushToBoard, rotate, dragConstraints
       return resetAfterDrop()
       
     }
+    console.log(`185`)
 
     const target = boardPositions.find(item => item.id === firstCell)
     if(!target) {
       return resetAfterDrop()
     }
 
+    console.log(`192`)
     const pos = getOriginalDicePosWithId(id)
     const diff = {x: pos.rect.x - offset.x - target.x, y: pos.rect.y - offset.y - target.y}
     dragStateRef.current = {
@@ -188,6 +196,7 @@ export const Drag = ({ children, style, id, pushToBoard, rotate, dragConstraints
       positionOnBoard: droppedIds
     }
     animateTo(diff.x * -1, diff.y * -1)
+    console.log(`200`)
 
     checkIfWon()
   };
@@ -251,8 +260,7 @@ export const Drag = ({ children, style, id, pushToBoard, rotate, dragConstraints
       } else if(op === "≠") {
         const s = new Set(items)
         const dupArr = [...s]
-        if(s.length !== dupArr.length) {
-          // console.log(`error`)
+        if(items.length !== dupArr.length) {
           allRegionsSatisfied = false
           return
         }

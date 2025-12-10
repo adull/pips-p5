@@ -1,11 +1,12 @@
 //board
-const board = []
+let board = []
 const getBoard = () => board
 const pushToBoard = (cell) => board.push(cell)
 const addValToCell = (val, cellId) => {
     const target = board.find(item => item.id === cellId)
     target.val = val
 }
+const clearBoard = () => board = []
 const getValFromCell = (cellId) => {
     const target = board.find(item => item.id === cellId)
     return target?.val
@@ -40,7 +41,7 @@ const getRegions = () => regions
 const setRegions = (r) => regions = r
 
 export { 
-    getBoard, pushToBoard, addValToCell, getValFromCell, findCell, 
+    clearBoard, getBoard, pushToBoard, addValToCell, getValFromCell, findCell, 
     getOffset, setOffset,
     getCellSize, updateCellSize,
     getOriginalDicePos, getOriginalDicePosWithId, pushToOriginalDicePos, clearOriginalDicePos,
