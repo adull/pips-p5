@@ -1,8 +1,9 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useContext } from "react";
 import { motion, useMotionValue, animate } from "motion/react";
 import { getBoard, getOffset, getValFromCell, addValToCell, getOriginalDicePosWithId, getRegions } from "../helpers";
+import GameContext from "../contexts/GameContext";
 
-export const Drag = ({ children, style, id, pushToBoard, rotate, dragConstraints }) => {
+export const Drag = ({ children, style, id, pushToBoard, rotate, dragConstraints, setIsSolved }) => {
   const [isDragging, setIsDragging] = useState(false)
 
   const x = useMotionValue(0);
@@ -221,24 +222,21 @@ export const Drag = ({ children, style, id, pushToBoard, rotate, dragConstraints
     if(!boardFull) return
 
     const regions = getRegions()
-    console.log({ regions })
     let allRegionsSatisfied = true
     regions.forEach(region => {
       
       const op = region.computedValue[0]
       const rest = region.computedValue.slice(1)
-      console.log({ op, rest })
       const items = getValsInRegion(region.coordinates)
-      console.log(sum(items))
       if (op === "<") {
         if(sum(items) >= parseInt(rest)) {
-          console.log(`error`)
+          // console.log(`error`)
           allRegionsSatisfied = false
           return
         }
       } else if (op === ">") {
         if(sum(items) <= parseInt(rest)) {
-          console.log(`error`)
+          // console.log(`error`)
           allRegionsSatisfied = false
           return
         }
@@ -246,7 +244,7 @@ export const Drag = ({ children, style, id, pushToBoard, rotate, dragConstraints
         const s = new Set(items)
         const dupArr = [...s]
         if(dupArr.length > 1 ) {
-          console.log(`error`)
+          // console.log(`error`)
           allRegionsSatisfied = false
           return 
         }
@@ -254,14 +252,14 @@ export const Drag = ({ children, style, id, pushToBoard, rotate, dragConstraints
         const s = new Set(items)
         const dupArr = [...s]
         if(s.length !== dupArr.length) {
-          console.log(`error`)
+          // console.log(`error`)
           allRegionsSatisfied = false
           return
         }
       } else {
         if(sum(items) !== parseInt(region.computedValue)) {
-          console.log(region)
-          console.log(sum(items), region.computedValue)
+          // console.log(region)
+          // console.log(sum(items), region.computedValue)
           console.log(`error`)
           allRegionsSatisfied = false
           return
@@ -273,7 +271,8 @@ export const Drag = ({ children, style, id, pushToBoard, rotate, dragConstraints
     })
     if(allRegionsSatisfied) {
       // settimeout cuz animation
-      setTimeout(() => alert('You won!'), 500)
+
+      setTimeout(() => setIsSolved(true), 500)
     } else {
       setTimeout(() => alert('Error'), 500)
     }

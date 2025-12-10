@@ -1,0 +1,52 @@
+import { useEffect, useState } from 'react';
+import { bak } from '../helpers/img';
+import WinnerModal from './WinnerModal'
+
+
+const GameBar = ({ style, isSolved, setMode, newPuzzle }) => {
+    const [time, setTime] = useState(0)
+
+    const formatSeconds = seconds => {
+        if (isNaN(seconds) || seconds < 0) return "-1";
+      
+        let secondTime = Math.floor(seconds);
+        let minuteTime = Math.floor(secondTime / 60);
+      
+        secondTime %= 60;
+        minuteTime %= 60;
+      
+        return (
+          `${minuteTime.toString().padStart(2, "0")}:${secondTime.toString().padStart(2, "0")}`
+        );
+    };
+
+    useEffect(() => {
+        
+    }, [])
+
+    useEffect(() => {
+        
+        const interval = setInterval(() => {
+            if(!isSolved) {
+                setTime(prev => prev + 1)
+            }
+        }, 1000)
+
+
+        return () => clearInterval(interval);
+    }, [isSolved])
+    return (
+        <>
+            <div className="flex">
+                <div className="container mx-auto p-6" style={{ width: style.width, height: '50px'}}>
+                    <img src={bak} onClick={() => setMode('home')} className="w-30" /> 
+                </div>
+                <div>{formatSeconds(time)}</div>
+            </div>
+            {isSolved ? <WinnerModal time={formatSeconds(time)} style={style} newPuzzle={newPuzzle} /> : <></>}
+        </>
+        
+    );
+}
+
+export default GameBar;

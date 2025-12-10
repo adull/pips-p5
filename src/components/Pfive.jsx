@@ -5,13 +5,14 @@ import GameController from "./GameController"
 import axios from "axios";  
 
 import { getCellSize, updateCellSize, setOffset, setRegions, pushToBoard } from "../helpers"
+import GameContext from "../contexts/GameContext";
   
 let cell = getCellSize()
 // const dicePositions = []
 const borderWidth = 8
 
 const getPadding = ({ width, height, rows }) => {
-  const tPadding = (height - cell.h * rows.length) / 8
+  const tPadding = (height - cell.h * rows.length) / 2
   const lPadding = (width - cell.w * rows[0].length) / 2
 
   return { tPadding, lPadding }
@@ -218,6 +219,7 @@ const Pfive = () => {
     const [dicePositions, setDicePositions] = useState([])
     const [canvasSize, setCanvasSize] = useState({ w: -1, h: -1})
     const [cellSize, setCellSize] = useState(getCellSize())
+    const [isSolved, setIsSolved] = useState(false)
 
     if(wrapperRef.current) {
       const rect = wrapperRef.current.getBoundingClientRect()
@@ -225,7 +227,8 @@ const Pfive = () => {
     }
 
     const request = async() => {
-      const res = await axios.get('http://localhost:9001/mothafuckin-api/pips?id=336')
+      setIsSolved(false)
+      const res = await axios.get('http://localhost:9001/mothafuckin-api/pips')
       const d = res.data
       if(d) {
         const dice = JSON.parse(d.dice)
@@ -255,22 +258,25 @@ const Pfive = () => {
     }, [])
   
     return (
-      <div className="relative" ref={wrapperRef}>
-        
-        <div className="pointer-events-none relative top-0 left-0">
-          <ReactP5Wrapper sketch={boardSketch} data={data} canvasSize={canvasSize} setCellSize={setCellSize}/>
+        <div className="relative" ref={wrapperRef}>
+          
+          <div className="pointer-events-none relative top-0 left-0">
+            <ReactP5Wrapper sketch={boardSketch} data={data} canvasSize={canvasSize} setCellSize={setCellSize}/>
+          </div>
+          <div className="absolute top-0 left-0" style={{ zIndex: 999 }}>
+            <GameController style={{width: canvasSize?.w, height: canvasSize?.h}} 
+                            isSolved={isSolved} setIsSolved={setIsSolved} newGame={request} />
+          </div>
+          <div className="pointer-events-none absolute top-0 left-0" style={{zIndex: 99}}>
+            <ReactP5Wrapper sketch={regionSketch} data={data} canvasSize={canvasSize}  />
+          </div>
+          <div className="absolute bottom-0" style={{height: 300}}>
+            <Dice dice={dicePositions} setDice={setDicePositions} setIsSolved={setIsSolved} 
+                  cellSize={cellSize} height={300} width={canvasSize.w} parent={wrapperRef} 
+            />
+          </div>
+          
         </div>
-        <div className="absolute top-0 left-0" style={{ zIndex: 999 }}>
-          <GameController style={{width: canvasSize?.w, height: canvasSize?.h}} />
-        </div>
-        <div className="pointer-events-none absolute top-0 left-0" style={{zIndex: 99}}>
-          <ReactP5Wrapper sketch={regionSketch} data={data} canvasSize={canvasSize}  />
-        </div>
-        <div className="absolute bottom-0" style={{height: 300}}>
-          <Dice dice={dicePositions} setDice={setDicePositions} cellSize={cellSize} height={300} width={canvasSize.w} parent={wrapperRef} />
-        </div>
-        
-      </div>
     )
   }
 

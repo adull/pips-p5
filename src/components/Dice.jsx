@@ -4,7 +4,7 @@ import Pip from './Pip'
 import { useEffect, useLayoutEffect, useRef } from "react"
 import { pushToOriginalDicePos, addValToCell } from '../helpers'
 
-const Dice = ({ dice, setDice, height, cellSize, width, parent }) => {
+const Dice = ({ dice, setDice, setIsSolved, height, cellSize, width, parent }) => {
     console.log(cellSize)
     // const cellSize = getCellSize()
     const diceRefs = useRef(Array.from(dice, _ => null))
@@ -43,7 +43,6 @@ const Dice = ({ dice, setDice, height, cellSize, width, parent }) => {
 
     return (
         <div className="flex flex-wrap justify-around items-center space-around flex-wrap" style={{height, width}}>
-            {console.log(cellSize)}
             {dice.map((die, index) => {
                 const style = {
                     transform: `rotate(${die.rotation * 90}deg)`,
@@ -55,14 +54,16 @@ const Dice = ({ dice, setDice, height, cellSize, width, parent }) => {
                 }
                 return (
                     <div ref={el => { initRef(el, index) }} key={index}>
-                    <Drag style={style} id={die.index} dragConstraints={parent} pushToBoard={(ids) => pushToBoard(ids, die)} rotate={(e) => rotate(e, index)} vals={die.val}>
-                        <div className="flex justify-center bg-white border b-1"
-                             style={{width: cellSize.w * 2, height: cellSize.w}}
+                        <Drag style={style} id={die.index} dragConstraints={parent} setIsSolved={setIsSolved}
+                              pushToBoard={(ids) => pushToBoard(ids, die)} rotate={(e) => rotate(e, index)} vals={die.val}
                         >
-                            <Pip first={true} val={die.val[0]} />
-                            <Pip first={false} val={die.val[1]} />
-                        </div>
-                    </Drag>
+                            <div className="flex justify-center bg-white border b-1"
+                                style={{width: cellSize.w * 2, height: cellSize.w}}
+                            >
+                                <Pip first={true} val={die.val[0]} />
+                                <Pip first={false} val={die.val[1]} />
+                            </div>
+                        </Drag>
                     </div>
                 )
             })}
