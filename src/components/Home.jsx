@@ -12,7 +12,8 @@ const Home = ({ style, setMode }) => {
                 <div className="flex-1 flex items-center justify-center">
                     <img
                         src={pipsImg}
-                        className="w-200 object-contain"
+                        className="object-contain"
+                        style={{width: '55%'}}
                     />
                 </div>
 

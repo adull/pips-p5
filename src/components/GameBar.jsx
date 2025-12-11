@@ -40,13 +40,13 @@ const GameBar = ({ style, isSolved, setMode, newPuzzle }) => {
 
     return (
         <>
-            <div className="flex">
+            <div className="flex" style={{ width: style.width }}>
                 <div className="container mx-auto p-6" style={{ width: style.width, height: '50px'}}>
-                    <img src={bak} onClick={() => setMode('home')} className="w-30" /> 
+                    <img src={bak} className="cursor-pointer w-30" onClick={() => setMode('home')} /> 
                 </div>
                 <div>{formatSeconds(time)}</div>
+                <button onClick={newPuzzleResetTime}>new puz</button>
             </div>
-            <button onClick={newPuzzleResetTime}>new puz</button>
             {isSolved ? <WinnerModal time={formatSeconds(time)} style={style} newPuzzle={newPuzzleResetTime} /> : <></>}
         </>
         

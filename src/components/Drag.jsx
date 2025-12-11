@@ -8,6 +8,7 @@ export const Drag = ({ children, style, id, pushToBoard, rotate, dragConstraints
   useEffect(() => {
     console.log(`animate to 0,0`)
     animateTo(0,0)
+    resetState()
   }, [gameCount])
 
   const x = useMotionValue(0);
@@ -47,7 +48,38 @@ export const Drag = ({ children, style, id, pushToBoard, rotate, dragConstraints
     });
   };
 
+
+  const getValsInRegion = (coordinates) => {
+    const vals = []
+    coordinates.forEach(coord => {
+      const id = `${coord.y}-${coord.x}`
+      vals.push(getValFromCell(id))
+    })
+    return vals
+  }
+
+  const sum = (arr) => {
+    let s = 0
+    arr.forEach(item => s += item)
+    return s
+  }
+
+  const resetState = () => {
+    console.log(`reset state`)
+    dragStateRef.current = {
+      pointerId: null,
+      startPointerX: 0,
+      startPointerY: 0,
+      startX: 0,
+      startY: 0,
+      isDragging: false,
+      hasMoved: false,
+      positionOnBoard: []
+    };
+  }
+
   const handlePointerDown = (event) => {
+    console.log(dragStateRef.current)
     document.body.style.cursor = 'grabbing'
 
     const el = event.currentTarget;
@@ -65,6 +97,7 @@ export const Drag = ({ children, style, id, pushToBoard, rotate, dragConstraints
     };
 
     const toReset = dragStateRef.current.positionOnBoard
+    console.log({ toReset})
     toReset.forEach(id => {
       addValToCell('', id)
     })
@@ -104,7 +137,6 @@ export const Drag = ({ children, style, id, pushToBoard, rotate, dragConstraints
     state.isDragging = false;
     const diePos = actualPosRef.current.getBoundingClientRect()
     const boardPositions = getBoard()
-    console.log({ boardPositions })
 
     if(!state.hasMoved && !state.positionOnBoard.length > 0) rotate(event)
 
@@ -161,7 +193,8 @@ export const Drag = ({ children, style, id, pushToBoard, rotate, dragConstraints
     } else {
       return resetAfterDrop()
     }
-    console.log(`ok so i get here,.,,.`)
+    const withVal = boardPositions.filter(item => item.val !== "")
+    console.log({ withVal})
 
     const smallestCell = (ids) => {
       let smallestVal = Infinity
@@ -181,14 +214,14 @@ export const Drag = ({ children, style, id, pushToBoard, rotate, dragConstraints
       return resetAfterDrop()
       
     }
-    console.log(`185`)
+    // console.log(`185`)
 
     const target = boardPositions.find(item => item.id === firstCell)
     if(!target) {
       return resetAfterDrop()
     }
 
-    console.log(`192`)
+    // console.log(`192`)
     const pos = getOriginalDicePosWithId(id)
     const diff = {x: pos.rect.x - offset.x - target.x, y: pos.rect.y - offset.y - target.y}
     dragStateRef.current = {
@@ -196,7 +229,7 @@ export const Drag = ({ children, style, id, pushToBoard, rotate, dragConstraints
       positionOnBoard: droppedIds
     }
     animateTo(diff.x * -1, diff.y * -1)
-    console.log(`200`)
+    // console.log(`200`)
 
     checkIfWon()
   };
@@ -207,21 +240,6 @@ export const Drag = ({ children, style, id, pushToBoard, rotate, dragConstraints
 
   const handlePointerLeave = (event) => {
     document.body.style.cursor = 'default'
-  }
-
-  const getValsInRegion = (coordinates) => {
-    const vals = []
-    coordinates.forEach(coord => {
-      const id = `${coord.y}-${coord.x}`
-      vals.push(getValFromCell(id))
-    })
-    return vals
-  }
-
-  const sum = (arr) => {
-    let s = 0
-    arr.forEach(item => s += item)
-    return s
   }
 
   const checkIfWon = () => {
@@ -279,6 +297,7 @@ export const Drag = ({ children, style, id, pushToBoard, rotate, dragConstraints
     })
     if(allRegionsSatisfied) {
       // settimeout cuz animation
+      resetState()
 
       setTimeout(() => setIsSolved(true), 500)
     } else {
