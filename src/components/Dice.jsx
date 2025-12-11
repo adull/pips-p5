@@ -1,7 +1,6 @@
-// import { motion } from "motion/react"
 import { Drag } from './Drag'
 import Pip from './Pip'
-import { useEffect, useLayoutEffect, useRef } from "react"
+import { useRef } from "react"
 import { pushToOriginalDicePos, addValToCell } from '../helpers'
 
 const Dice = ({ dice, setDice, gameCount, setIsSolved, height, cellSize, width, parent }) => {

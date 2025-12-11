@@ -1,10 +1,8 @@
-import { useEffect, useState } from 'react';
 import { w, i, n1, n2, e, r, exclam1, exclam2, exclam3 } from '../helpers/img';
 
 
 const WinnerModal = ({ time, style, newPuzzle }) => {
     const imgs = [w, i, n1, n2, e, r, exclam1, exclam2, exclam3]
-    console.log({ imgs })
     return (
         <div className="absolute top-0 left-0" style={style}>
             <div

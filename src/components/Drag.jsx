@@ -1,12 +1,11 @@
-import React, { useEffect, useState, useRef, useContext } from "react";
-import { motion, useMotionValue, animate } from "motion/react";
+import React, { useEffect, useState, useRef } from "react";
+import { useMotionValue, animate } from "motion/react";
 import { getBoard, getOffset, getValFromCell, addValToCell, getOriginalDicePosWithId, getRegions } from "../helpers";
 
 export const Drag = ({ children, style, id, pushToBoard, rotate, dragConstraints, gameCount, setIsSolved }) => {
   const [isDragging, setIsDragging] = useState(false)
 
   useEffect(() => {
-    console.log(`animate to 0,0`)
     animateTo(0,0)
     resetState()
   }, [gameCount])
@@ -65,7 +64,6 @@ export const Drag = ({ children, style, id, pushToBoard, rotate, dragConstraints
   }
 
   const resetState = () => {
-    console.log(`reset state`)
     dragStateRef.current = {
       pointerId: null,
       startPointerX: 0,
@@ -79,7 +77,6 @@ export const Drag = ({ children, style, id, pushToBoard, rotate, dragConstraints
   }
 
   const handlePointerDown = (event) => {
-    console.log(dragStateRef.current)
     document.body.style.cursor = 'grabbing'
 
     const el = event.currentTarget;
@@ -97,7 +94,6 @@ export const Drag = ({ children, style, id, pushToBoard, rotate, dragConstraints
     };
 
     const toReset = dragStateRef.current.positionOnBoard
-    console.log({ toReset})
     toReset.forEach(id => {
       addValToCell('', id)
     })
@@ -187,14 +183,11 @@ export const Drag = ({ children, style, id, pushToBoard, rotate, dragConstraints
     droppedIds.forEach(id => {
       bothEmpty = bothEmpty && (getValFromCell(id) === '') 
     })
-    // console.log({ bothEmpty })
     if(bothEmpty) {
       pushToBoard(droppedIds)
     } else {
       return resetAfterDrop()
     }
-    const withVal = boardPositions.filter(item => item.val !== "")
-    console.log({ withVal})
 
     const smallestCell = (ids) => {
       let smallestVal = Infinity
@@ -234,11 +227,11 @@ export const Drag = ({ children, style, id, pushToBoard, rotate, dragConstraints
     checkIfWon()
   };
 
-  const handlePointerEnter = (event) => {
+  const handlePointerEnter = () => {
     document.body.style.cursor = 'grab'
   }
 
-  const handlePointerLeave = (event) => {
+  const handlePointerLeave = () => {
     document.body.style.cursor = 'default'
   }
 
@@ -286,7 +279,7 @@ export const Drag = ({ children, style, id, pushToBoard, rotate, dragConstraints
         if(sum(items) !== parseInt(region.computedValue)) {
           // console.log(region)
           // console.log(sum(items), region.computedValue)
-          console.log(`error`)
+          // console.log(`error`)
           allRegionsSatisfied = false
           return
         }
@@ -301,7 +294,7 @@ export const Drag = ({ children, style, id, pushToBoard, rotate, dragConstraints
 
       setTimeout(() => setIsSolved(true), 500)
     } else {
-      setTimeout(() => alert('Error'), 500)
+      // setTimeout(() => alert('Error'), 500)
     }
     // }
   }

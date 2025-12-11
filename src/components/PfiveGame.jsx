@@ -46,13 +46,12 @@ const getPadding = ({ width, height, rows }) => {
       }
     }
   
-    p5.setup = (props) => {
+    p5.setup = () => {
       p5.createCanvas(1, 1);
       p5.background(200);
     }
   
     p5.updateWithProps = props => {
-      console.log(`in board sketch should update with props`)
       const {w, h} = props.canvasSize
       const setCellSize = props.setCellSize
       const { rows } = props.data
@@ -62,10 +61,8 @@ const getPadding = ({ width, height, rows }) => {
           // find if rows or cols are bigger
           const minViewDim = Math.min(w,h)
           const maxBoardDim = Math.max(rows.length, rows[0].length)
-          console.log((maxBoardDim + 2) * cell.w, minViewDim)
           if((maxBoardDim + 2) * cell.w > minViewDim) {
             const newSize = minViewDim / (maxBoardDim + 2)
-            console.log({ newSize})
             updateCellSize(newSize)
             setCellSize({w: newSize, h: newSize})
           }
@@ -198,7 +195,6 @@ const regionSketch = (p5) => {
   }
 
   p5.updateWithProps = (props) => {
-    console.log(`in region sketch should update with props`)
     const {w, h} = props.canvasSize
     if(w  > 0 && h > 0) {
       p5.resizeCanvas(w,h)
@@ -228,10 +224,7 @@ const PfiveGame = () => {
     }
 
     const request = async() => {
-      console.log(`do this..?`)
-      console.log({dicePositions})
       setIsSolved(false)
-      // const res = await axios.get('http://localhost:9001/mothafuckin-api/pips?id=62')
       
       const res = await axios.get('http://localhost:9001/mothafuckin-api/pips')
       const d = res.data
@@ -252,9 +245,7 @@ const PfiveGame = () => {
       if(wrapperRef.current) {
         const w = wrapperRef.current.clientWidth
         const bounds = wrapperRef.current.getBoundingClientRect()
-        // console.log(bounds)
         const h = window.innerHeight - bounds.top - 20
-        console.log({ w, h })
         setCanvasSize({w,h})
         
       }
