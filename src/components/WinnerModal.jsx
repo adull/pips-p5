@@ -1,5 +1,4 @@
-import { w, i, n1, n2, e, r, exclam1, exclam2, exclam3 } from '../helpers/img';
-
+import { w, i, n1, n2, e, r, exclam1, exclam2, exclam3 } from '../helpers/pips-img';
 
 const WinnerModal = ({ time, style, newPuzzle }) => {
     const imgs = [w, i, n1, n2, e, r, exclam1, exclam2, exclam3]

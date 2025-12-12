@@ -1,4 +1,4 @@
-import { h2p2, okgotit } from '../helpers/img';
+import { h2p2, okgotit } from '../helpers/pips-img';
 import Borders from './Borders'
 
 const Instructions = ({ style, setMode }) => {

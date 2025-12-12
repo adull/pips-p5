@@ -1,4 +1,4 @@
-import { pipsImg, sg, h2p } from '../helpers/img';
+import { pipsImg, sg, h2p } from '../helpers/pips-img';
 import Borders from './Borders'
 
 const Home = ({ style, setMode }) => {

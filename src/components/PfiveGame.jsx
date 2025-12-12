@@ -11,11 +11,37 @@ let cell = getCellSize()
 const borderWidth = 8
 
 const getPadding = ({ width, height, rows }) => {
-  const tPadding = (height - cell.h * rows.length) / 2
-  const lPadding = (width - cell.w * rows[0].length) / 2
+  const getColBounds = (rows) => {
+    let minCol = Infinity
+    let maxCol = -Infinity
+  
+    rows.forEach(row => {
+      row.forEach((val, i) => {
+        if (val === 1) {
+          minCol = Math.min(minCol, i)
+          maxCol = Math.max(maxCol, i)
+        }
+      })
+    })
+  
+    if (minCol === Infinity) {
+      return { minCol: 0, maxCol: -1, colCount: 0 }
+    }
+  
+    return maxCol - minCol + 1
+  }
+
+  const rowCount = rows.length
+  const colCount = getColBounds(rows)
+
+  const gridW = colCount * cell.w
+  const gridH = rowCount * cell.h
+  const lPadding = Math.max(0, (width  - gridW) / 2)
+  const tPadding = Math.max(0, (height - gridH) / 2)
 
   return { tPadding, lPadding }
 }
+
 
   /**
    * @param {import("p5")} p5
@@ -48,7 +74,6 @@ const getPadding = ({ width, height, rows }) => {
   
     p5.setup = () => {
       p5.createCanvas(1, 1);
-      p5.background(200);
     }
   
     p5.updateWithProps = props => {
@@ -56,7 +81,6 @@ const getPadding = ({ width, height, rows }) => {
       const setCellSize = props.setCellSize
       const { rows } = props.data
       if(rows) {
-        
         if(w  > 0 && h > 0) {
           // find if rows or cols are bigger
           const minViewDim = Math.min(w,h)
@@ -67,13 +91,11 @@ const getPadding = ({ width, height, rows }) => {
             setCellSize({w: newSize, h: newSize})
           }
           p5.resizeCanvas(w,h)
-          const { width, height } = p5
           p5.background(200);
+          const { width, height } = p5
           createBoard({ width, height: height - 300, rows})  
         }
       }
-      // const { width, height } = p5
-      
     };
   }
   

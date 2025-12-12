@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useMotionValue, animate } from "motion/react";
+import { motion, useMotionValue, animate } from "motion/react";
 import { getBoard, getOffset, getValFromCell, addValToCell, getOriginalDicePosWithId, getRegions } from "../helpers";
 
 export const Drag = ({ children, style, id, pushToBoard, rotate, dragConstraints, gameCount, setIsSolved }) => {

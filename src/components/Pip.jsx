@@ -1,4 +1,4 @@
-import { zero, one, two, three, fo, five, six } from '../helpers/img'
+import { zero, one, two, three, fo, five, six } from '../helpers/pips-img'
 
 const Pip = ({ first, val }) => {
     const map = {
@@ -13,7 +13,7 @@ const Pip = ({ first, val }) => {
 
     return (
         <div className={`flex flex-wrap justify-center items-center ${first ? `border-r-1` : ``}`} >
-            <img className="select-none pointer-events-none p-5" src={map[val]} />
+            <img className="select-none pointer-events-none" src={map[val]} style={{padding: '1rem'}} />
         </div>
     )
 }

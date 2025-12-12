@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { bak } from '../helpers/img';
+import { bak } from '../helpers/pips-img';
 import WinnerModal from './WinnerModal'
 
 
@@ -40,7 +40,7 @@ const GameBar = ({ style, isSolved, setMode, newPuzzle }) => {
 
     return (
         <>
-            <div className="flex" style={{ width: style.width }}>
+            <div className="flex mt-4 px-4" style={{ width: style.width }}>
                 <div className="flex container mx-auto" style={{height: '50px'}}>
                     <img src={bak} className="cursor-pointer w-30" onClick={() => setMode('home')} /> 
                 </div>

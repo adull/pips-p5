@@ -1,4 +1,4 @@
-import { leftBorder, rightBorder } from "../helpers/img"
+import { leftBorder, rightBorder } from "../helpers/pips-img"
 const Borders = () => {
     return (
         <>
